@@ -20,6 +20,17 @@ struct AN4ReaderFixture : ReaderFixture
     }
 };
 
+struct iVectorFixture : ReaderFixture
+{
+    iVectorFixture()
+        : ReaderFixture(
+        "%CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY%/Speech/iVector",
+        "This test uses external data that is not part of the CNTK repository. Environment variable CNTK_EXTERNAL_TESTDATA_SOURCE_DIRECTORY must be set to point to the external test data location. \n Refer to the 'Setting up CNTK on Windows' documentation.)")
+    {
+    }
+};
+
+
 // Use SpeechReaderFixture for most tests
 // Some of them (e.g. 10, will use different data, thus a different fixture)
 BOOST_FIXTURE_TEST_SUITE(ReaderTestSuite, AN4ReaderFixture)
@@ -620,6 +631,28 @@ BOOST_AUTO_TEST_CASE(HTKDeserializersSimpleDataLoop12)
 };
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_FIXTURE_TEST_SUITE(ReaderIVectorTestSuite, iVectorFixture)
+
+BOOST_AUTO_TEST_CASE(HTKMLFIVectorSimple)
+{
+    HelperRunReaderTest<double>(
+        testDataPath() + "/Config/HTKDeserializersSimpleDataLoop12_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderIVectorSimple_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderIVectorSimple_Output.txt",
+        "Simple_Test",
+        "reader",
+        500,
+        250,
+        2,
+        1,
+        1,
+        0,
+        1);
+};
+
+BOOST_AUTO_TEST_SUITE_END()
+
 }
 
 }}}
