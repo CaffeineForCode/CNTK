@@ -21,13 +21,6 @@ Simple_Test = [
             scpFile = "$DataDir$/features.rscp"
         ]
    
-        features2=[
-            dim=100
-            scpFile="$DataDir$/ivector.rscp"
-            type="real"
-            expandToUtterance=true
-        ]
-
         labels = [
             mlfFile = "$DataDir$/labels.smlf"
             labelMappingFile = "$DataDir$/labels.statelist"

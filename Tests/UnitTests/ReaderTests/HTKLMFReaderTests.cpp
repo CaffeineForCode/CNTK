@@ -634,6 +634,31 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_FIXTURE_TEST_SUITE(ReaderIVectorTestSuite, iVectorFixture)
 
+const std::wstring ivector = L"Simple_Test=[reader=[\n"
+    L"features2 = [\n"
+        L"dim = 100\n"
+        L"scpFile = \"$DataDir$/ivector.rscp\"\n"
+        L"type = \"real\"\n"
+        L"expandToUtterance = true\n"
+    L"]]]";
+
+BOOST_AUTO_TEST_CASE(HTKMLFNoIVectorSimple)
+{
+    HelperRunReaderTest<double>(
+        testDataPath() + "/Config/HTKMLFReaderIVectorSimple_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderNoIVectorSimple_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderNoIVectorSimple_Output.txt",
+        "Simple_Test",
+        "reader",
+        400,
+        30,
+        1,
+        1,
+        1,
+        0,
+        1);
+};
+
 BOOST_AUTO_TEST_CASE(HTKMLFIVectorSimple)
 {
     HelperRunReaderTest<double>(
@@ -648,47 +673,41 @@ BOOST_AUTO_TEST_CASE(HTKMLFIVectorSimple)
         2,
         1,
         0,
-        1);
-};
-
-BOOST_AUTO_TEST_CASE(HTKMLFNoIVectorSimple)
-{
-    HelperRunReaderTest<double>(
-        testDataPath() + "/Config/HTKMLFReaderNoIVectorSimple_Config.cntk",
-        testDataPath() + "/Control/HTKMLFReaderNoIVectorSimple_Control.txt",
-        testDataPath() + "/Control/HTKMLFReaderNoIVectorSimple_Output.txt",
-        "Simple_Test",
-        "reader",
-        400,
-        30,
         1,
-        1,
-        1,
-        0,
-        1);
+        false,
+        false,
+        true,
+        { ivector });
 };
 
 BOOST_AUTO_TEST_CASE(HTKMLFIVectorSequenceSimple)
 {
     HelperRunReaderTest<double>(
-        testDataPath() + "/Config/HTKMLFReaderIVectorSequenceSimple_Config.cntk",
+        testDataPath() + "/Config/HTKMLFReaderIVectorSimple_Config.cntk",
         testDataPath() + "/Control/HTKMLFReaderIVectorSequenceSimple_Control.txt",
         testDataPath() + "/Control/HTKMLFReaderIVectorSequenceSimple_Output.txt",
         "Simple_Test",
         "reader",
-        400,
+        200,
         30,
         1,
         2,
         1,
         0,
-        1);
+        1,
+        false,
+        false,
+        true,
+        {
+            L"frameMode=false",
+            ivector
+        });
 };
 
 BOOST_AUTO_TEST_CASE(HTKMLFIVectorBpttSimple)
 {
     HelperRunReaderTest<double>(
-        testDataPath() + "/Config/HTKMLFReaderIVectorBpttSimple_Config.cntk",
+        testDataPath() + "/Config/HTKMLFReaderIVectorSimple_Config.cntk",
         testDataPath() + "/Control/HTKMLFReaderIVectorBpttSimple_Control.txt",
         testDataPath() + "/Control/HTKMLFReaderIVectorBpttSimple_Output.txt",
         "Simple_Test",
@@ -699,10 +718,16 @@ BOOST_AUTO_TEST_CASE(HTKMLFIVectorBpttSimple)
         2,
         1,
         0,
-        1);
+        1,
+        false,
+        false,
+        true,
+        {
+            L"frameMode=false",
+            L"truncated=true",
+            ivector
+        });
 };
-
-
 
 BOOST_AUTO_TEST_SUITE_END()
 
