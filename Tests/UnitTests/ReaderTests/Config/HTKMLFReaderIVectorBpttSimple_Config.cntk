@@ -5,6 +5,8 @@ DataDir = $RootDir$
 deviceId = -1
 
 precision = "double"
+frameMode = false
+truncated = true 
 
 Simple_Test = [
     reader = [
@@ -13,17 +15,15 @@ Simple_Test = [
         miniBatchMode = "partial"
         randomize = "auto"
         verbosity = 0
-        frameMode = false
-        truncated = true
 
-        features = [
+        features1 = [
             dim = 40
             contextWindow=41
             type = "real"
             scpFile = "$DataDir$/features.rscp"
         ]
    
-        ivectors=[
+        features2=[
             dim=100
             scpFile="$DataDir$/ivector.rscp"
             type="real"

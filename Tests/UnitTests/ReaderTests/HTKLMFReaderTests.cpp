@@ -637,19 +637,72 @@ BOOST_FIXTURE_TEST_SUITE(ReaderIVectorTestSuite, iVectorFixture)
 BOOST_AUTO_TEST_CASE(HTKMLFIVectorSimple)
 {
     HelperRunReaderTest<double>(
-        testDataPath() + "/Config/HTKDeserializersSimpleDataLoop12_Config.cntk",
+        testDataPath() + "/Config/HTKMLFReaderIVectorSimple_Config.cntk",
         testDataPath() + "/Control/HTKMLFReaderIVectorSimple_Control.txt",
         testDataPath() + "/Control/HTKMLFReaderIVectorSimple_Output.txt",
         "Simple_Test",
         "reader",
-        500,
-        250,
+        400,
+        30,
+        1,
         2,
+        1,
+        0,
+        1);
+};
+
+BOOST_AUTO_TEST_CASE(HTKMLFNoIVectorSimple)
+{
+    HelperRunReaderTest<double>(
+        testDataPath() + "/Config/HTKMLFReaderNoIVectorSimple_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderNoIVectorSimple_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderNoIVectorSimple_Output.txt",
+        "Simple_Test",
+        "reader",
+        400,
+        30,
+        1,
         1,
         1,
         0,
         1);
 };
+
+BOOST_AUTO_TEST_CASE(HTKMLFIVectorSequenceSimple)
+{
+    HelperRunReaderTest<double>(
+        testDataPath() + "/Config/HTKMLFReaderIVectorSequenceSimple_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderIVectorSequenceSimple_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderIVectorSequenceSimple_Output.txt",
+        "Simple_Test",
+        "reader",
+        400,
+        30,
+        1,
+        2,
+        1,
+        0,
+        1);
+};
+
+BOOST_AUTO_TEST_CASE(HTKMLFIVectorBpttSimple)
+{
+    HelperRunReaderTest<double>(
+        testDataPath() + "/Config/HTKMLFReaderIVectorBpttSimple_Config.cntk",
+        testDataPath() + "/Control/HTKMLFReaderIVectorBpttSimple_Control.txt",
+        testDataPath() + "/Control/HTKMLFReaderIVectorBpttSimple_Output.txt",
+        "Simple_Test",
+        "reader",
+        400,
+        30,
+        1,
+        2,
+        1,
+        0,
+        1);
+};
+
+
 
 BOOST_AUTO_TEST_SUITE_END()
 
