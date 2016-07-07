@@ -11,7 +11,7 @@ Simple_Test = [
         readerType = "HTKMLFReader"
         readMethod = "blockRandomize"
         miniBatchMode = "partial"
-        randomize = "auto"
+        randomize = 450000
         verbosity = 0
 
         features1 = [
