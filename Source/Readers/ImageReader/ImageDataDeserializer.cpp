@@ -361,11 +361,11 @@ cv::Mat FileByteReader::Read(size_t, const std::string& path, bool grayscale)
     return cv::imread(path, grayscale ? cv::IMREAD_GRAYSCALE : cv::IMREAD_COLOR);
 }
 
-bool ImageDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key, SequenceDescription& result)
+bool ImageDataDeserializer::GetSequenceDescription(const SequenceDescription& primary, SequenceDescription& result)
 {
-    auto index = m_keyToSequence.find(key.m_sequence);
+    auto index = m_keyToSequence.find(primary.m_key.m_sequence);
     // Checks whether it is a known sequence for us.
-    if (key.m_sample != 0 || index == m_keyToSequence.end())
+    if (primary.m_key.m_sample != 0 || index == m_keyToSequence.end())
     {
         return false;
     }

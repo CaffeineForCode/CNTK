@@ -37,8 +37,8 @@ public:
     // Gets sequence descriptions for the chunk.
     virtual void GetSequencesForChunk(ChunkIdType, std::vector<SequenceDescription>&) override;
 
-    // Gets sequence description by key.
-    bool GetSequenceDescriptionByKey(const KeyType&, SequenceDescription&) override;
+    // Gets sequence description by primary one.
+    bool GetSequenceDescription(const SequenceDescription& primary, SequenceDescription&) override;
 
 private:
     // Creates a set of sequence descriptions.

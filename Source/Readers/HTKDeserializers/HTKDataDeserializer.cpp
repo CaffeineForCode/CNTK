@@ -508,10 +508,10 @@ void HTKDataDeserializer::GetSequenceById(ChunkIdType chunkId, size_t id, vector
 }
 
 // Gets sequence description by its key.
-bool HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key, SequenceDescription& d)
+bool HTKDataDeserializer::GetSequenceDescription(const SequenceDescription& primary, SequenceDescription& d)
 {
     assert(!m_primary);
-    auto iter = m_keyToChunkLocation.find(key.m_sequence);
+    auto iter = m_keyToChunkLocation.find(primary.m_key.m_sequence);
     if (iter == m_keyToChunkLocation.end())
     {
         return false;
@@ -522,7 +522,7 @@ bool HTKDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key, Sequen
     const auto& chunk = m_chunks[chunkId];
     const auto& sequence = chunk.GetUtterance(utteranceIndexInsideChunk);
     d.m_chunkId = (ChunkIdType)chunkId;
-    d.m_id = m_frameMode ? chunk.GetStartFrameIndexInsideChunk(utteranceIndexInsideChunk) + key.m_sample : utteranceIndexInsideChunk;
+    d.m_id = m_frameMode ? chunk.GetStartFrameIndexInsideChunk(utteranceIndexInsideChunk) + primary.m_key.m_sample : utteranceIndexInsideChunk;
     d.m_numberOfSamples = m_frameMode ? 1 : (uint32_t)sequence->GetNumberOfFrames();
     return true;
 }

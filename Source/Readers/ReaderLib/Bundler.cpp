@@ -111,7 +111,7 @@ void Bundler::CreateChunkDescriptions()
             size_t sequenceSamples = sequence.m_numberOfSamples;
             for (size_t deserializerIndex = 1; deserializerIndex < m_deserializers.size(); ++deserializerIndex)
             {
-                isValid = m_deserializers[deserializerIndex]->GetSequenceDescriptionByKey(sequenceDescriptions[sequenceIndex].m_key, s);
+                isValid = m_deserializers[deserializerIndex]->GetSequenceDescription(sequenceDescriptions[sequenceIndex], s);
                 if (!isValid)
                 {
                     invalid.insert(sequenceIndex);
@@ -199,7 +199,7 @@ void Bundler::GetSequencesForChunk(ChunkIdType chunkId, std::vector<SequenceDesc
             uint32_t sequenceSamples = sequence.m_numberOfSamples;
             for (size_t deserializerIndex = 1; deserializerIndex < m_deserializers.size(); ++deserializerIndex)
             {
-                m_deserializers[deserializerIndex]->GetSequenceDescriptionByKey(sequence.m_key, s);
+                m_deserializers[deserializerIndex]->GetSequenceDescription(sequence, s);
                 sequenceSamples = std::max(sequenceSamples, s.m_numberOfSamples);
             }
             sequence.m_numberOfSamples = sequenceSamples;
@@ -268,7 +268,7 @@ public:
                 }
 
                 size_t currentIndex = sequenceIndex * deserializers.size() + deserializerIndex;
-                deserializers[deserializerIndex]->GetSequenceDescriptionByKey(sequences[sequenceIndex].m_key, s);
+                deserializers[deserializerIndex]->GetSequenceDescription(sequences[sequenceIndex], s);
                 m_sequenceToSequence[currentIndex] = s.m_id;
 
                 ChunkPtr secondaryChunk = chunkTable[s.m_chunkId].lock();

@@ -34,8 +34,8 @@ public:
     // Retrieves data for a chunk.
     virtual ChunkPtr GetChunk(ChunkIdType chunkId) override;
 
-    // Gets sequence description by its key.
-    virtual bool GetSequenceDescriptionByKey(const KeyType&, SequenceDescription&) override;
+    // Gets sequence description by the primary one.
+    virtual bool GetSequenceDescription(const SequenceDescription& primary, SequenceDescription&) override;
 
 private:
     class HTKChunk;

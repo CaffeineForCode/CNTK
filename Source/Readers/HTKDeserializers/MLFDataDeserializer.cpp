@@ -321,10 +321,10 @@ void MLFDataDeserializer::GetSequenceById(size_t sequenceId, vector<SequenceData
     }
 }
 
-bool MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key, SequenceDescription& result)
+bool MLFDataDeserializer::GetSequenceDescription(const SequenceDescription& primary, SequenceDescription& result)
 {
 
-    auto sequenceId = key.m_sequence < m_keyToSequence.size() ? m_keyToSequence[key.m_sequence] : SIZE_MAX;
+    auto sequenceId = primary.m_key.m_sequence < m_keyToSequence.size() ? m_keyToSequence[primary.m_key.m_sequence] : SIZE_MAX;
 
     if (sequenceId == SIZE_MAX)
     {
@@ -332,11 +332,11 @@ bool MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key, Sequen
     }
 
     result.m_chunkId = 0;
-    result.m_key = key;
+    result.m_key = primary.m_key;
 
     if (m_frameMode)
     {
-        size_t index = m_utteranceIndex[sequenceId] + key.m_sample;
+        size_t index = m_utteranceIndex[sequenceId] + primary.m_key.m_sample;
         result.m_id = index;
         result.m_numberOfSamples = 1;
     }
