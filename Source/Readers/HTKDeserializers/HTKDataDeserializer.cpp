@@ -249,7 +249,7 @@ ChunkDescriptions HTKDataDeserializer::GetChunkDescriptions()
 // This information is used by the randomizer to fill in current windows of sequences.
 void HTKDataDeserializer::GetSequencesForChunk(ChunkIdType chunkId, vector<SequenceDescription>& result)
 {
-    HTKChunkDescription& chunk = m_chunks[chunkId];
+    const HTKChunkDescription& chunk = m_chunks[chunkId];
     result.reserve(m_frameMode ? chunk.GetTotalFrames() : chunk.GetNumberOfUtterances());
     size_t offsetInChunk = 0;
     for (size_t i = 0; i < chunk.GetNumberOfUtterances(); ++i)
@@ -474,7 +474,7 @@ static void AugmentNeighbors(const MatrixAsVectorOfVectors& utterance,
 // Sequence ids are guaranteed to be unique inside a chunk.
 void HTKDataDeserializer::GetSequenceById(ChunkIdType chunkId, size_t id, vector<SequenceDataPtr>& r)
 {
-    auto& chunkDescription = m_chunks[chunkId];
+    const auto& chunkDescription = m_chunks[chunkId];
     size_t utteranceIndex = m_frameMode ? chunkDescription.GetUtteranceForChunkFrameIndex(id) : id;
     const UtteranceDescription* utterance = chunkDescription.GetUtterance(utteranceIndex);
     auto utteranceFrames = chunkDescription.GetUtteranceFrames(utteranceIndex);

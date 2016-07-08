@@ -73,6 +73,12 @@ public:
     }
 
     // Get utterance description by its index.
+    const UtteranceDescription* GetUtterance(size_t index) const
+    {
+        return &m_utterances[index];
+    }
+
+    // Get utterance description by its index.
     UtteranceDescription* GetUtterance(size_t index)
     {
         return &m_utterances[index];
