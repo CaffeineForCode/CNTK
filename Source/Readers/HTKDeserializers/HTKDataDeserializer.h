@@ -84,6 +84,10 @@ private:
     unsigned int m_samplePeriod = 0;
     size_t m_ioFeatureDimension = 0;
     std::string m_featureKind;
+
+    // A flag that indicates whether the utterance should be extended to the utterance from the primary deserializer.
+    // TODO: This should be moved to the packers when deserializers work in sequence mode only.
+    bool m_expandToPrimary;
 };
 
 typedef std::shared_ptr<HTKDataDeserializer> HTKDataDeserializerPtr;

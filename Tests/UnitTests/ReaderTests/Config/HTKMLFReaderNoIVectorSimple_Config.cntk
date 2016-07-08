@@ -8,15 +8,16 @@ precision = "double"
 
 Simple_Test = [
     reader = [
+        minimizeReaderMemoryFootprint=false
         readerType = "HTKMLFReader"
         readMethod = "blockRandomize"
         miniBatchMode = "partial"
-        randomize = "auto"
+        randomize = 450000
         verbosity = 0
 
         features = [
             dim = 40
-            contextWindow=41
+            contextWindow=3
             type = "real"
             scpFile = "$DataDir$/features.rscp"
         ]

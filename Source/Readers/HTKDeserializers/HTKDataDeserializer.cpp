@@ -46,6 +46,12 @@ HTKDataDeserializer::HTKDataDeserializer(
     ConfigParameters input = inputs.front();
     auto inputName = input.GetMemberIds().front();
 
+    m_expandToPrimary = cfg(L"expandToUtterance", false);
+    if (m_expandToPrimary && m_primary)
+    {
+        InvalidArgument("Cannot expand utterances of the primary stream %ls, please change your configuration.", inputName.c_str());
+    }
+
     ConfigParameters streamConfig = input(inputName);
 
     ConfigHelper config(streamConfig);
@@ -84,6 +90,12 @@ HTKDataDeserializer::HTKDataDeserializer(
 
     m_dimension = config.GetFeatureDimension();
     m_dimension = m_dimension * (1 + context.first + context.second);
+
+    m_expandToPrimary = feature(L"expandToUtterance", false);
+    if (m_expandToPrimary && m_primary)
+    {
+        InvalidArgument("Cannot expand utterances of the primary stream %ls, please change your configuration.", featureName.c_str());
+    }
 
     InitializeChunkDescriptions(config);
     InitializeStreams(featureName);
@@ -238,7 +250,7 @@ ChunkDescriptions HTKDataDeserializer::GetChunkDescriptions()
 // This information is used by the randomizer to fill in current windows of sequences.
 void HTKDataDeserializer::GetSequencesForChunk(ChunkIdType chunkId, vector<SequenceDescription>& result)
 {
-    const HTKChunkDescription& chunk = m_chunks[chunkId];
+    HTKChunkDescription& chunk = m_chunks[chunkId];
     result.reserve(m_frameMode ? chunk.GetTotalFrames() : chunk.GetNumberOfUtterances());
     size_t offsetInChunk = 0;
     for (size_t i = 0; i < chunk.GetNumberOfUtterances(); ++i)
@@ -463,14 +475,15 @@ static void AugmentNeighbors(const MatrixAsVectorOfVectors& utterance,
 // Sequence ids are guaranteed to be unique inside a chunk.
 void HTKDataDeserializer::GetSequenceById(ChunkIdType chunkId, size_t id, vector<SequenceDataPtr>& r)
 {
-    const auto& chunkDescription = m_chunks[chunkId];
+    auto& chunkDescription = m_chunks[chunkId];
     size_t utteranceIndex = m_frameMode ? chunkDescription.GetUtteranceForChunkFrameIndex(id) : id;
     const UtteranceDescription* utterance = chunkDescription.GetUtterance(utteranceIndex);
     auto utteranceFrames = chunkDescription.GetUtteranceFrames(utteranceIndex);
 
     // wrapper that allows m[j].size() and m[j][i] as required by augmentneighbors()
     MatrixAsVectorOfVectors utteranceFramesWrapper(utteranceFrames);
-    FeatureMatrix features(m_dimension, m_frameMode ? 1 : utterance->GetNumberOfFrames());
+    size_t utteranceLength = m_frameMode ? 1  : (m_expandToPrimary ? utterance->GetExpansionLength() : utterance->GetNumberOfFrames());
+    FeatureMatrix features(m_dimension, utteranceLength);
 
     if (m_frameMode)
     {
@@ -479,9 +492,16 @@ void HTKDataDeserializer::GetSequenceById(ChunkIdType chunkId, size_t id, vector
         auto fillIn = features.col(0);
         AugmentNeighbors(utteranceFramesWrapper, frameIndex, m_augmentationWindow.first, m_augmentationWindow.second, fillIn);
     }
-    else
+    else if (m_expandToPrimary) // Broadcast a single frame to the complete utterance.
     {
-        // Augment complete utterance.
+        for (size_t resultingIndex = 0; resultingIndex < utterance->GetExpansionLength(); ++resultingIndex)
+        {
+            auto fillIn = features.col(resultingIndex);
+            AugmentNeighbors(utteranceFramesWrapper, 0, m_augmentationWindow.first, m_augmentationWindow.second, fillIn);
+        }
+    }
+    else // Augment the complete utterance.
+    {
         for (size_t frameIndex = 0; frameIndex < utterance->GetNumberOfFrames(); ++frameIndex)
         {
             auto fillIn = features.col(frameIndex);
@@ -519,10 +539,26 @@ bool HTKDataDeserializer::GetSequenceDescription(const SequenceDescription& prim
 
     auto chunkId = iter->second.first;
     auto utteranceIndexInsideChunk = iter->second.second;
-    const auto& chunk = m_chunks[chunkId];
-    const auto& sequence = chunk.GetUtterance(utteranceIndexInsideChunk);
+    auto& chunk = m_chunks[chunkId];
+    auto sequence = chunk.GetUtterance(utteranceIndexInsideChunk);
+
     d.m_chunkId = (ChunkIdType)chunkId;
-    d.m_id = m_frameMode ? chunk.GetStartFrameIndexInsideChunk(utteranceIndexInsideChunk) + primary.m_key.m_sample : utteranceIndexInsideChunk;
+
+    // TODO: When we move frame mode from deserializer, this should go away.
+    if (m_expandToPrimary)
+    {
+        // Expanding for sequence length/or max seen frame.
+        size_t maxLength = max(primary.m_numberOfSamples, primary.m_key.m_sample + 1);
+        if (sequence->GetExpansionLength() < maxLength)
+        {
+            sequence->SetExpansionLength(maxLength);
+        }
+        d.m_id = utteranceIndexInsideChunk;
+    }
+    else
+    {
+        d.m_id = m_frameMode ? chunk.GetStartFrameIndexInsideChunk(utteranceIndexInsideChunk) + primary.m_key.m_sample : utteranceIndexInsideChunk;
+    }
     d.m_numberOfSamples = m_frameMode ? 1 : (uint32_t)sequence->GetNumberOfFrames();
     return true;
 }

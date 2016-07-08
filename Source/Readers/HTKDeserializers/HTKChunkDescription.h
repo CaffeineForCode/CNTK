@@ -73,7 +73,7 @@ public:
     }
 
     // Get utterance description by its index.
-    const UtteranceDescription* GetUtterance(size_t index) const
+    UtteranceDescription* GetUtterance(size_t index)
     {
         return &m_utterances[index];
     }
@@ -105,7 +105,7 @@ public:
         }
 
         const size_t ts = m_firstFrames[index];
-        const size_t n = GetUtterance(index)->GetNumberOfFrames();
+        const size_t n = m_utterances[index].GetNumberOfFrames();
         return msra::dbn::matrixstripe(m_frames, ts, n);
     }
 
