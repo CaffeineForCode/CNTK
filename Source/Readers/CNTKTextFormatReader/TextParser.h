@@ -36,7 +36,7 @@ public:
     // Get information about particular chunk.
     void GetSequencesForChunk(ChunkIdType chunkId, std::vector<SequenceDescription>& result) override;
 
-    bool GetSequenceDescription(const SequenceDescription&, SequenceDescription&) override;
+    bool GetSequenceDescriptionByKey(const KeyType&, SequenceDescription&) override;
 
 private:
     // Builds an index of the input data.

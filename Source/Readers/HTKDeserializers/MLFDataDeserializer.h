@@ -23,8 +23,8 @@ public:
     // TODO: Should be removed, when all readers go away, expects configuration in a legacy mode.
     MLFDataDeserializer(CorpusDescriptorPtr corpus, const ConfigParameters& config, const std::wstring& streamName);
 
-    // Retrieves sequence description by the primary description. Used for deserializers that are not in "primary"/"driving" mode.
-    bool GetSequenceDescription(const SequenceDescription& primary, SequenceDescription& s) override;
+    // Retrieves sequence description by its key. Used for deserializers that are not in "primary"/"driving" mode.
+    bool GetSequenceDescriptionByKey(const KeyType& key, SequenceDescription& s) override;
 
     // Gets description of all chunks.
     virtual ChunkDescriptions GetChunkDescriptions() override;

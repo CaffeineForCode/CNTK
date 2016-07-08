@@ -1194,10 +1194,10 @@ std::wstring TextParser<ElemType>::GetFileInfo()
 }
 
 template <class ElemType>
-bool TextParser<ElemType>::GetSequenceDescription(const SequenceDescription& primary, SequenceDescription& result)
+bool TextParser<ElemType>::GetSequenceDescriptionByKey(const KeyType& key, SequenceDescription& result)
 {
     const auto& keys = m_indexer->GetIndex().m_keyToSequenceInChunk;
-    auto sequenceLocation = keys.find(primary.m_key.m_sequence);
+    auto sequenceLocation = keys.find(key.m_sequence);
     if (sequenceLocation == keys.end())
     {
         return false;
