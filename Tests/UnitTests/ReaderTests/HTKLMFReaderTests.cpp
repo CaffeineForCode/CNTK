@@ -692,7 +692,7 @@ BOOST_AUTO_TEST_CASE(HTKIVectorSequence)
 {
     auto test = [this](std::vector<std::wstring> additionalParameters)
     {
-        HelperRunReaderTest<double>(
+        HelperRunReaderTest<float>(
             testDataPath() + "/Config/HTKMLFReaderIVectorSimple_Config.cntk",
             testDataPath() + "/Control/HTKMLFReaderIVectorSequenceSimple_Control.txt",
             testDataPath() + "/Control/HTKMLFReaderIVectorSequenceSimple_Output.txt",
@@ -711,8 +711,8 @@ BOOST_AUTO_TEST_CASE(HTKIVectorSequence)
             additionalParameters);
     };
 
-    test({ L"frameMode=false" });
-    test({ L"frameMode=false", L"Simple_Test=[reader=[readerType=HTKDeserializers]]" });
+    test({ L"frameMode=false", L"precision=float" });
+    test({ L"frameMode=false", L"precision=float", L"Simple_Test=[reader=[readerType=HTKDeserializers]]" });
 };
 
 BOOST_AUTO_TEST_CASE(HTKIVectorBptt)
