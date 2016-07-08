@@ -129,6 +129,13 @@ void HTKDataDeserializer::InitializeChunkDescriptions(ConfigHelper& config)
         UtteranceDescription description(move(msra::asr::htkfeatreader::parsedpath(u)));
         size_t numberOfFrames = description.GetNumberOfFrames();
 
+        if (m_expandToPrimary && numberOfFrames != 1)
+        {
+            RuntimeError("Expanded stream should only contain sequences of length 1, utterance '%s' has %d",
+                description.GetKey().c_str(),
+                (int)numberOfFrames);
+        }
+
         // For logging, also account for utterances and frames that we skip
         allUtterances++;
         allFrames += numberOfFrames;
