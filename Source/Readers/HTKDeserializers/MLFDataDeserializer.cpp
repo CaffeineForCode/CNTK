@@ -323,6 +323,7 @@ void MLFDataDeserializer::GetSequenceById(size_t sequenceId, vector<SequenceData
 
 bool MLFDataDeserializer::GetSequenceDescriptionByKey(const KeyType& key, SequenceDescription& result)
 {
+
     auto sequenceId = key.m_sequence < m_keyToSequence.size() ? m_keyToSequence[key.m_sequence] : SIZE_MAX;
 
     if (sequenceId == SIZE_MAX)
