@@ -9,7 +9,6 @@
 #include "HTKDataDeserializer.h"
 #include "ConfigHelper.h"
 #include "Basics.h"
-#include <numeric>
 
 // TODO: This will be removed when dependency on old code is eliminated.
 // Currently this fixes the linking.
@@ -544,11 +543,11 @@ bool HTKDataDeserializer::GetSequenceDescription(const SequenceDescription& prim
 
     d.m_chunkId = (ChunkIdType)chunkId;
 
-    // TODO: When we move frame mode from deserializer, this should go away.
+    // TODO: When we move frame mode from deserializer, expanding should go away and be done on the higher level.
     if (m_expandToPrimary)
     {
         // Expanding for sequence length/or max seen frame.
-        size_t maxLength = max(primary.m_numberOfSamples, primary.m_key.m_sample + 1);
+        size_t maxLength = max(primary.m_numberOfSamples, (uint32_t)primary.m_key.m_sample + 1);
         if (sequence->GetExpansionLength() < maxLength)
         {
             sequence->SetExpansionLength(maxLength);
