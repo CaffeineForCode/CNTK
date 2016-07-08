@@ -138,8 +138,11 @@ namespace CNTK
     // Forward declarations
     class CompositeFunction;
     class Function;
-    class LearnerBase;
     class Dictionary;
+    
+    namespace Learners {
+        class LearnerBase;
+    }
 
     namespace _Internal
     {
@@ -398,7 +401,7 @@ namespace CNTK
         class CNTK_API _SimpleSet final
         {
             friend class ::CNTK::CompositeFunction;
-            friend class ::CNTK::LearnerBase;
+            friend class ::CNTK::Learners::LearnerBase;
 
             template <typename T>
             friend CNTK_API bool operator==(const _SimpleSet<T>& first, const _SimpleSet<T>& second);
@@ -504,7 +507,29 @@ namespace CNTK
     class Learner;
     typedef _Internal::_ReferenceCounterSharedPtr<Learner> LearnerPtr;
 
-    class LearnerBase;
+    class Variable;
+
+    class DeviceDescriptor;
+
+    namespace _Internal {
+
+        CNTK_API LearnerPtr SGDLearner(const _SimpleSet<Variable>& parameters, const DeviceDescriptor& device);
+
+        CNTK_API LearnerPtr MomentumSGDLearner(const _SimpleSet<Variable>& parameters, const DeviceDescriptor& device);
+
+        CNTK_API LearnerPtr NAGLearner(const _SimpleSet<Variable>& parameters, const DeviceDescriptor& device);
+
+        CNTK_API LearnerPtr AdaGradLearner(const _SimpleSet<Variable>& parameters, bool needAveMultiplier,
+                                           const DeviceDescriptor& device);
+
+        CNTK_API LearnerPtr FSAdaGradLearner(const _SimpleSet<Variable>& parameters, const DeviceDescriptor& device);
+
+        CNTK_API LearnerPtr RMSPropLearner(const _SimpleSet<Variable>& parameters,
+                                           double gamma, double inc, double dec, double max, double min, bool needAveMultiplier,
+                                           const DeviceDescriptor& device);
+    }
+
+
 
     inline wchar_t* CopyString(const wchar_t* source)
     {

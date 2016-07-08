@@ -19,6 +19,8 @@
 #include "SimpleDistGradAggregator.h"
 #include "ProgressTracing.h"
 
+#include "Learner.h"
+
 #include <map>
 #include <set>
 
@@ -1850,8 +1852,17 @@ void SGD<ElemType>::UpdateWeights(const double learnRatePerSample,
         // we use simple linear (instead of log linear) scaling here
         const double momentum = MomentumPerMB(momentumPerSample, actualMBSize);
 
-        learner->SetLearningRate(learnRatePerSample);
-        learner->SetMomentum(momentum);
+        auto learnerBase = dynamic_cast<::CNTK::Learners::LearnerBase*>(learner.GetPtr());
+
+        // TODO: remove down-casting and setters as soon as Training control is implemented.
+        learnerBase->SetLearningRate(learnRatePerSample);
+
+        auto momentumLearner = dynamic_cast<::CNTK::Learners::MomentumSGDLearner*>(learner.GetPtr());
+
+        if (momentumLearner != nullptr)
+        {
+            momentumLearner->SetMomentum(momentum);
+        }
 
         unordered_map<::CNTK::Variable, ::CNTK::ValuePtr> parameters;
         unordered_map<::CNTK::Variable, const ::CNTK::ValuePtr> gradients;
@@ -2202,7 +2213,8 @@ void SGD<ElemType>::ResetSGDMomentum()
                     
     for (auto& learner : m_learners)
     {
-        learner->ResetSmoothedGradients();
+        auto learnerBase = dynamic_cast<::CNTK::Learners::LearnerBase*>(learner.GetPtr());
+        learnerBase->ResetSmoothedGradients();
     }                
 }
 
@@ -2228,35 +2240,50 @@ void SGD<ElemType>::InstantiateLearner(GradientsUpdateType type,
         parameters.insert(parameter);
     }
 
-    ::CNTK::Learner::AdditionalParameters additionalParameters;
-    additionalParameters.l1RegWeight = m_L1RegWeight;
-    additionalParameters.l2RegWeight = m_L2RegWeight;
-    additionalParameters.gaussianNoiseInjectStd = GradientUpdateNoiseStd();
-    additionalParameters.gradientClippingWithTruncation = m_gradientClippingWithTruncation;
-    additionalParameters.clippingThresholdPerSample = m_clippingThresholdPerSample;
-    additionalParameters.device = device;
-
-    // TODO: confirm that multipliers are not supposed to change during training.
-    additionalParameters.SetLearningRateMultipliers(learningRateMultipliers);
 
     switch (type)
     {
     case GradientsUpdateType::None:
-        m_learners.push_back(::CNTK::SGDLearner(parameters, m_useNesterovMomentum, additionalParameters));
+        if (m_momentumParam.size() == 0) 
+        {
+            m_learners.push_back(::CNTK::SGDLearner(parameters, device));
+        }
+        else if (m_useNesterovMomentum)
+        {
+            m_learners.push_back(::CNTK::MomentumSGDLearner(parameters, device));
+        }
+        else
+        {
+            m_learners.push_back(::CNTK::NAGLearner(parameters, device));
+        }
+
         break;
     case GradientsUpdateType::AdaGrad:
-        m_learners.push_back(::CNTK::AdaGradLearner(parameters, m_needAveMultiplier, additionalParameters));
+        m_learners.push_back(::CNTK::AdaGradLearner(parameters, m_needAveMultiplier, device));
         break;
     case GradientsUpdateType::FSAdaGrad:
-        m_learners.push_back(::CNTK::FSAdaGradLearner(parameters, additionalParameters));
+        m_learners.push_back(::CNTK::FSAdaGradLearner(parameters, device));
         break;
     case GradientsUpdateType::RmsProp:
         m_learners.push_back(::CNTK::RMSPropLearner(parameters,
-        m_rpi.gamma, m_rpi.inc, m_rpi.max, m_rpi.dec, m_rpi.min, m_needAveMultiplier, additionalParameters));
+        m_rpi.gamma, m_rpi.inc, m_rpi.max, m_rpi.dec, m_rpi.min, m_needAveMultiplier, device));
         break;
     default:
         NOT_IMPLEMENTED;
     }  
+
+     ::CNTK::Learners::AdditionalLearningOptions additionalOptions;
+    additionalOptions.l1RegularizationWeight = m_L1RegWeight;
+    additionalOptions.l2RegularizationWeight = m_L2RegWeight;
+    additionalOptions.gaussianNoiseInjectionStdDev = GradientUpdateNoiseStd();
+    additionalOptions.gradientClippingWithTruncation = m_gradientClippingWithTruncation;
+    additionalOptions.gradientClippingThresholdPerSample = m_clippingThresholdPerSample;
+
+    // TODO: confirm that multipliers are not supposed to change during training.
+    additionalOptions.SetLearningRateMultipliers(learningRateMultipliers);
+    
+    auto learnerBase = dynamic_cast<::CNTK::Learners::LearnerBase*>(m_learners.back().GetPtr());
+    learnerBase->SetAdditionalOptions(additionalOptions);
 }
 
 template class SGD<float>;
